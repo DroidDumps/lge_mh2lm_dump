@@ -1,0 +1,31 @@
+#LAOP
+on post-fs
+    mkdir /mnt/vendor/persist-lg/laop 0771 system radio
+    mkdir /mnt/vendor/persist-lg/laop/property 0771 system radio
+    mkdir /mnt/vendor/persist-lg/poweron 0775 root root
+
+#SmartCA
+on property:persist.vendor.lge.smartca.changed=1
+    wait /dev/block/bootdevice/by-name/carrier
+    #mount ext4 /dev/block/bootdevice/by-name/carrier /mnt/product/carrier rw remount nosuid nodev barrier=1 noauto_da_alloc
+    restorecon_recursive /mnt/product/carrier
+    mkdir /mnt/product/carrier/_SMARTCA_RES 0775 system system
+    start cota_update
+
+on property:persist.vendor.lge.smartca.changed=2
+    wait /dev/block/bootdevice/by-name/carrier
+    #mount ext4 /dev/block/bootdevice/by-name/carrier /mnt/product/carrier ro remount nosuid nodev barrier=1 noauto_da_alloc
+    restorecon_recursive /mnt/product/carrier
+    start cota_update
+
+on property:persist.vendor.lge.smartca.undo=1
+    wait /dev/block/bootdevice/by-name/carrier
+    restorecon_recursive /mnt/product/carrier
+    start smartca_undo
+
+on property:persist.vendor.lge.smartca.undo=2
+    wait /dev/block/bootdevice/by-name/carrier
+    restorecon_recursive /mnt/product/carrier
+
+on property:persist.product.lge.msn_channel=ORG
+    setprop ro.product.brand1 orange

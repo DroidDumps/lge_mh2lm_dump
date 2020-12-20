@@ -1,0 +1,9 @@
+service lg_pvc_license /system/bin/lg_pvc_license
+    class main
+    user system
+    group system
+    oneshot
+    disabled
+
+on property:product.lge.pvclicense.loaded=1
+    start tbaseLoader

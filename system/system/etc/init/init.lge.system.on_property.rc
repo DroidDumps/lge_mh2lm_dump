@@ -1,0 +1,12 @@
+#######################################################
+# FILE_SYSTEM
+#######################################################
+on property:product.lge.vold.publicvolume_uuid=*
+    setprop vendor.lge.vold.publicvolume_uuid ${product.lge.vold.publicvolume_uuid}
+
+#######################################################
+# Security
+#######################################################
+on property:product.lge.adb_auth=*
+    setprop vendor.lge.adb_auth ${product.lge.adb_auth}
+

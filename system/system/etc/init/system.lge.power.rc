@@ -1,0 +1,46 @@
+
+# fuel gauge dumper for debug
+service fg-dump /system/bin/sh /system/bin/logger_fg.sh 10 /data/logger/fg.log
+   class main
+   user root
+   group root system
+   disabled
+   oneshot
+   seclabel u:r:log_services:s0
+
+on chargerlogo_exec
+   setprop persist.vendor.lge.service.kernel.enable 4
+   start log-kernel
+
+on property:persist.vendor.lge.service.fg.enable=0
+   stop fg-dump
+on property:persist.vendor.lge.service.fg.enable=1
+   start fg-dump
+on property:persist.vendor.lge.service.fg.enable=2
+   start fg-dump
+on property:persist.vendor.lge.service.fg.enable=3
+   start fg-dump
+on property:persist.vendor.lge.service.fg.enable=4
+   start fg-dump
+on property:persist.vendor.lge.service.fg.enable=5
+   restart fg-dump
+
+# bsm sys node
+on boot
+   chown system system /sys/devices/platform/lge-unified-nodes/bsm_timetofull
+
+# bsm data file
+on post-fs-data
+    mkdir /data/system/power 0775 system system
+    chmod 775 /data/system/power
+    chown system system /data/system/power
+    chmod 664 /data/system/power/chargingPatternObject.dat
+    chmod 664 /data/system/power/chargingTimeObject.dat
+    chown system system /data/system/power/chargingPatternObject.dat
+    chown system system /data/system/power/chargingTimeObject.dat
+
+#bsm service
+on property:persist.vendor.lge.service.bsm.bsm_ttf=*
+	write /sys/devices/platform/lge-unified-nodes/bsm_timetofull ${persist.vendor.lge.service.bsm.bsm_ttf}
+on property:persist.vendor.lge.service.bsm.bsm_ttf=0
+	write /sys/devices/platform/lge-unified-nodes/bsm_timetofull 0

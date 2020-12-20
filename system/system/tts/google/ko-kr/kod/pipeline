@@ -1,0 +1,615 @@
+stream {
+  name: "input"
+  classname: "CopyStream"
+}
+stream {
+  name: "lucid_markup_parser"
+  classname: "LucidMarkupParserStream"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+      phonology_ref: "phonology"
+      utf8_utils_ref: "utf8_utils"
+      engine_config_ref: "engine_config"
+      lucid_markup_ref: "lucid_markup"
+    }
+  }
+}
+stream {
+  name: "user_lexicon_initializer"
+  classname: "UserLexiconInitializerStream"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+      user_lexicon_ref: "user_lexicon"
+    }
+  }
+}
+stream {
+  name: "nfc_normalizer"
+  classname: "NfcNormalizerStream"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+      nfc_normalizer_ref: "nfc_normalizer"
+    }
+  }
+}
+stream {
+  name: "rewrite_simple"
+  classname: "RewriteStream"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+      rewrite_algo_ref: "rewrite_algo"
+    }
+  }
+}
+stream {
+  name: "tokenize_and_classify_kestrel"
+  classname: "TokenizeAndClassifyGrmStream"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+      phonology_ref: "phonology"
+      tokenize_and_classify_grm_algo_ref: "tokenize_and_classify_grm_algo"
+    }
+  }
+}
+stream {
+  name: "fallback_token_classifier"
+  classname: "FallbackTokenClassifierStream"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+    }
+  }
+}
+stream {
+  name: "token_resolver"
+  classname: "TokenResolverStream"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+      resolve_token_homographs_algo_ref: "token_resolver_algo"
+    }
+  }
+}
+stream {
+  name: "verbalize_kestrel"
+  classname: "VerbalizeGrmStream"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+      verbalize_grm_algo_ref: "verbalize_grm_algo"
+    }
+  }
+}
+stream {
+  name: "transliterate"
+  classname: "TransliterateGrmStream"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+      transliterate_grm_algo_ref: "transliterate_grm_algo"
+    }
+  }
+}
+stream {
+  name: "word_resolver"
+  classname: "WordResolverStream"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+      resolve_homographs_simple_algo_ref: "word_resolver_algo"
+    }
+  }
+}
+stream {
+  name: "basic_pronounce"
+  classname: "BasicPronounceStream"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+      phonology_ref: "phonology"
+      lexicon_ref: "combined_lexicon"
+      engine_config_ref: "engine_config"
+      learned_fst_g2p_mapper_ref: "learned_fst_g2p_mapper"
+    }
+  }
+}
+stream {
+  name: "lstm_synthesizer"
+  classname: "LstmSynthesizerStream"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+      add_specification_ref: "lstm_add_specification_resource"
+      lstm_dur_model_ref: "lstm_dur_model"
+      lstm_speech_model_ref: "lstm_speech_model"
+      vocoding_ref: "vocoding_resource"
+      engine_config_ref: "engine_config"
+      acoustic_frame_config_ref: "acoustic_frame_config"
+      parametric_playback_spec_ref: "parametric_playback_spec"
+    }
+  }
+}
+stream {
+  name: "utterance_to_audio_event"
+  classname: "UtteranceToEventStream"
+  params {
+    [speech.tts.UtteranceToEventParams.id] {
+      event_type: TTS_EVENT_AUDIO_FINISHED
+    }
+  }
+}
+stream {
+  name: "controller_events"
+  classname: "CopyStream"
+}
+connect {
+  from: "input"
+  to: "lucid_markup_parser"
+}
+connect {
+  from: "lucid_markup_parser"
+  to: "user_lexicon_initializer"
+}
+connect {
+  from: "user_lexicon_initializer"
+  to: "nfc_normalizer"
+}
+connect {
+  from: "nfc_normalizer"
+  to: "rewrite_simple"
+}
+connect {
+  from: "rewrite_simple"
+  to: "tokenize_and_classify_kestrel"
+}
+connect {
+  from: "tokenize_and_classify_kestrel"
+  to: "fallback_token_classifier"
+}
+connect {
+  from: "fallback_token_classifier"
+  to: "token_resolver"
+}
+connect {
+  from: "token_resolver"
+  to: "verbalize_kestrel"
+}
+connect {
+  from: "verbalize_kestrel"
+  to: "transliterate"
+}
+connect {
+  from: "transliterate"
+  to: "word_resolver"
+}
+connect {
+  from: "word_resolver"
+  to: "basic_pronounce"
+}
+connect {
+  from: "basic_pronounce"
+  to: "lstm_synthesizer"
+}
+connect {
+  from: "lstm_synthesizer"
+  to: "utterance_to_audio_event"
+}
+connect {
+  from: "utterance_to_audio_event"
+  to: "controller_events"
+}
+resource {
+  name: "acoustic_frame_config"
+  classname: "AcousticFrameConfig"
+  params {
+    [speech.tts.DataSourceParams.id] {
+      path: "../ism/acoustic_frame_config.pb"
+      type: FILE
+    }
+    [speech.tts.DeduplicationParams.id] {
+      dedupe_key: "114fcdeb-0417-4225-805b-98e6df1e7c30"
+    }
+  }
+}
+resource {
+  name: "disambiguation_rules"
+  classname: "HomographDisambiguationRulesData"
+  params {
+    [speech.tts.DataSourceParams.id] {
+      path: "../ism/disambiguation_rules_kr.pb"
+      type: FILE
+    }
+    [speech.tts.DeduplicationParams.id] {
+      dedupe_key: "15551957-d8f8-4424-8488-b45946a6d96c"
+    }
+  }
+}
+resource {
+  name: "engine_config"
+  classname: "EngineConfig"
+  params {
+    [speech.tts.DataSourceParams.id] {
+      path: "engine_config_ko_kr_x_kod_greco_embedded_lstm.pb"
+      type: FILE
+    }
+  }
+}
+resource {
+  name: "homograph_mapping_grammar"
+  classname: "GrmManager"
+  params {
+    [speech.tts.GrmFarResourceParams.id] {
+      data_source {
+        path: "../ism/mapping_grammar_android.far"
+        type: FILE
+      }
+    }
+    [speech.tts.DeduplicationParams.id] {
+      dedupe_key: "d381510f-2668-4b98-bccb-e11b19e86080"
+    }
+  }
+}
+resource {
+  name: "lstm_dur_model"
+  classname: "PortableLstmPredictDurationsResource"
+  params {
+    [speech.tts.LstmModelResourceParams.id] {
+      acoustic_frame_config_ref: "acoustic_frame_config"
+      frame_position_code_length: 0
+      apply_voicemod: false
+      engine_config_ref: "engine_config"
+      nn_config: "lstm_dur_model_nn_config"
+      input_mean_std_dev {
+        path: "../kob/lstm_dur_model_input_mean_std_dev"
+        type: FILE
+      }
+      output_mean_std_dev {
+        path: "../kob/lstm_dur_model_output_mean_std_dev"
+        type: FILE
+      }
+      defer_timing_adjustment: false
+    }
+    [speech.tts.DeduplicationParams.id] {
+      dedupe_key: "91f1977d-ecc1-4be5-8a23-1d92288c447c"
+    }
+  }
+}
+resource {
+  name: "lstm_speech_model"
+  classname: "PortableLstmPredictSpeechParamsResource"
+  params {
+    [speech.tts.LstmModelResourceParams.id] {
+      acoustic_frame_config_ref: "acoustic_frame_config"
+      frame_position_code_length: 3
+      apply_voicemod: false
+      engine_config_ref: "engine_config"
+      nn_config: "lstm_speech_model_nn_config"
+      input_mean_std_dev {
+        path: "../kob/lstm_speech_model_input_mean_std_dev"
+        type: FILE
+      }
+      output_mean_std_dev {
+        path: "../kob/lstm_speech_model_output_mean_std_dev"
+        type: FILE
+      }
+      infer_on_sunn: false
+      defer_timing_adjustment: false
+    }
+    [speech.tts.DeduplicationParams.id] {
+      dedupe_key: "aaa6d494-4b16-4544-853f-865aa4bf2ce9"
+    }
+  }
+}
+resource {
+  name: "nfc_normalizer"
+  classname: "NfcNormalizer"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+    }
+  }
+}
+resource {
+  name: "parametric_playback_spec"
+  classname: "ParametricPlaybackSpec"
+  params {
+    [speech.tts.DataSourceParams.id] {
+      path: "../ism/empty_playback_params.pb"
+      type: FILE
+    }
+    [speech.tts.DeduplicationParams.id] {
+      dedupe_key: "7a286640-7e7f-490b-8d17-ff1087b50c30"
+    }
+  }
+}
+resource {
+  name: "phonology"
+  classname: "Phonology"
+  params {
+    [speech.tts.DataSourceParams.id] {
+      path: "../ism/ko_kr_phonology.pb"
+      type: FILE
+    }
+    [speech.tts.DeduplicationParams.id] {
+      dedupe_key: "2e988fb0-4788-40c1-a055-2efc72955f75"
+    }
+  }
+}
+resource {
+  name: "combined_lexicon"
+  classname: "LexiconResource"
+  params {
+    [speech.tts.LexiconResourceParams.id] {
+      data_source {
+        path: "../ism/compressed_lexicon_ko_kr.blex"
+        type: FILE
+      }
+      phonology_ref: "phonology"
+    }
+    [speech.tts.DeduplicationParams.id] {
+      dedupe_key: "a503626b-845a-4a69-a1dd-1d744debadb2"
+    }
+  }
+}
+resource {
+  name: "learned_fst_g2p_mapper"
+  classname: "LearnedFstG2pMapper"
+  params {
+    [speech.tts.LearnedFstG2pMapperResourceParams.id] {
+      ref {
+        phonology_ref: "phonology"
+        engine_config_ref: "engine_config"
+      }
+      fst_g2p_data_source {
+        path: "../ism/g2p_m3_syls0_stress0_ko-KR.fst"
+        type: FILE
+      }
+    }
+    [speech.tts.DeduplicationParams.id] {
+      dedupe_key: "bc893b26-706f-44c5-991d-be75be76ca6e"
+    }
+  }
+}
+resource {
+  name: "lstm_add_specification_resource"
+  classname: "AddSpecificationResource"
+  params {
+    [speech.tts.AddSpecificationResourceParams.id] {
+      phonology_ref: "phonology"
+      data_source {
+        path: "../kob/feature_set.textproto"
+      }
+      feature_set_type: REGULAR
+      specification_type: PARAMETRIC_SYNTHESIS
+    }
+    [speech.tts.DeduplicationParams.id] {
+      dedupe_key: "206a8528-8822-40a8-a2fe-c06d0e613d8f"
+    }
+  }
+}
+resource {
+  name: "rewrite_algo"
+  classname: "Rewrite"
+  params {
+    [speech.tts.RewriteResourceParams.id] {
+      ref {
+        phonology_ref: "phonology"
+        engine_config_ref: "engine_config"
+      }
+      regexp_rewrites_file {
+        path: "../ism/regexp_rewrite.pb"
+        type: FILE
+      }
+      default_normalizations_file {
+        path: "../ism/default_normalizations.pb"
+        type: FILE
+      }
+      language_specific_normalizations_file {
+        path: "../ism/normalization_overrides.pb"
+        type: FILE
+      }
+    }
+    [speech.tts.DeduplicationParams.id] {
+      dedupe_key: "e8412349-f744-4e22-89fa-424857352c88"
+    }
+  }
+}
+resource {
+  name: "serialization_spec"
+  classname: "SerializeSpec"
+  params {
+    [speech.tts.DataSourceParams.id] {
+      path: "../ism/ko_verbalize_spec.pb"
+      type: FILE
+    }
+    [speech.tts.DeduplicationParams.id] {
+      dedupe_key: "8ff8ce7e-539a-4707-93c5-3cbb58b2c070"
+    }
+  }
+}
+resource {
+  name: "textnorm_params"
+  classname: "TextnormParams"
+  params {
+    [speech.tts.DataSourceParams.id] {
+      path: "../ism/textnorm_params_ko_kr.pb"
+      type: FILE
+    }
+    [speech.tts.DeduplicationParams.id] {
+      dedupe_key: "7898561d-4fb0-4e43-a6a6-d7cba8cc612b"
+    }
+  }
+}
+resource {
+  name: "tokenize_and_classify_grm_fst"
+  classname: "GrmManager"
+  params {
+    [speech.tts.GrmFarResourceParams.id] {
+      fst_names: "TOKENIZE_AND_CLASSIFY"
+      data_source {
+        path: "../ism/tokenize_and_classify_android.far"
+        type: FILE
+      }
+    }
+    [speech.tts.DeduplicationParams.id] {
+      dedupe_key: "37a576f8-a657-4684-bb47-40dc11c11e1e"
+    }
+  }
+}
+resource {
+  name: "transliterate_grm_fst"
+  classname: "GrmManager"
+  params {
+    [speech.tts.GrmFarResourceParams.id] {
+      fst_names: "TRANS"
+      data_source {
+        path: "../ism/transliterate_android.far"
+        type: FILE
+      }
+    }
+    [speech.tts.DeduplicationParams.id] {
+      dedupe_key: "5f6d1568-0a9f-4186-9c60-fde25d900e37"
+    }
+  }
+}
+resource {
+  name: "utf8_utils"
+  classname: "Utf8UtilsResource"
+  params {
+    [speech.tts.Utf8UtilsResourceParams.id] {
+      phonology_ref: "phonology"
+    }
+    [speech.tts.DeduplicationParams.id] {
+      dedupe_key: "d2ce646c-4f59-4f9e-b159-077470b6fd82"
+    }
+  }
+}
+resource {
+  name: "token_resolver_algo"
+  classname: "TokenResolver"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+      grm_far_ref: "homograph_mapping_grammar"
+      basic_homographs_ref: "disambiguation_rules"
+      utf8_utils_ref: "utf8_utils"
+      engine_config_ref: "engine_config"
+    }
+  }
+}
+resource {
+  name: "verbalize_grm_fst"
+  classname: "GrmManager"
+  params {
+    [speech.tts.GrmFarResourceParams.id] {
+      fst_names: "ALL"
+      data_source {
+        path: "../ism/verbalize_android.far"
+        type: FILE
+      }
+    }
+    [speech.tts.DeduplicationParams.id] {
+      dedupe_key: "1337fe5a-bb79-4a9b-bb24-68b0d6b52163"
+    }
+  }
+}
+resource {
+  name: "vocoding_resource"
+  classname: "Vocoding"
+  params {
+    [speech.tts.VocodingResourceParams.id] {
+      acoustic_frame_config_ref: "acoustic_frame_config"
+      morphing_palette {
+        path: "../nmp/speech_morphing_palette.pb"
+        type: FILE
+      }
+      engine_config_ref: "engine_config"
+    }
+    [speech.tts.DeduplicationParams.id] {
+      dedupe_key: "8f7e03fb-62d0-4680-a900-b3948756f9bc"
+    }
+  }
+}
+resource {
+  name: "voice_params"
+  classname: "VoiceParams"
+  params {
+    [speech.tts.VoiceParams.id] {
+      description: "embedded_lstm voice with embedded textnorm for ko_kr (speaker kod; sample rate 22050)"
+      language: "ko"
+      region: "kr"
+      speaker: "kod"
+      gender: "male"
+      quality: "normal"
+      sample_rate: 22050
+      server_voice_name: "kod-greco-embedded-zeong"
+      supports_set_sample_rate: true
+      multi_speaker: false
+      voice_platform: EMBEDDED_LSTM
+    }
+  }
+}
+resource {
+  name: "lexical_classifier"
+  classname: "LexicalClassifier"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+      voice_params_ref: "voice_params"
+      lexicon_ref: "combined_lexicon"
+      textnorm_params_ref: "textnorm_params"
+      utf8_utils_ref: "utf8_utils"
+      engine_config_ref: "engine_config"
+    }
+  }
+}
+resource {
+  name: "tokenize_and_classify_grm_algo"
+  classname: "TokenizeAndClassifyGrm"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+      grm_far_ref: "tokenize_and_classify_grm_fst"
+      phonology_ref: "phonology"
+      lexicon_ref: "combined_lexicon"
+      utf8_utils_ref: "utf8_utils"
+      engine_config_ref: "engine_config"
+      lexical_classifier_ref: "lexical_classifier"
+    }
+  }
+}
+resource {
+  name: "transliterate_grm_algo"
+  classname: "TransliterateGrm"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+      grm_far_ref: "transliterate_grm_fst"
+      phonology_ref: "phonology"
+      lexicon_ref: "combined_lexicon"
+      engine_config_ref: "engine_config"
+      lexical_classifier_ref: "lexical_classifier"
+    }
+  }
+}
+resource {
+  name: "verbalize_grm_algo"
+  classname: "VerbalizeGrm"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+      grm_far_ref: "verbalize_grm_fst"
+      phonology_ref: "phonology"
+      lexicon_ref: "combined_lexicon"
+      engine_config_ref: "engine_config"
+      serialization_spec_ref: "serialization_spec"
+      lexical_classifier_ref: "lexical_classifier"
+    }
+  }
+}
+resource {
+  name: "word_resolver_algo"
+  classname: "WordResolver"
+  params {
+    [speech.tts.ResourceReferenceParams.id] {
+      basic_homographs_ref: "disambiguation_rules"
+      utf8_utils_ref: "utf8_utils"
+      engine_config_ref: "engine_config"
+    }
+  }
+}
+session_resource {
+  name: "lucid_markup"
+  classname: "LucidMarkupResource"
+}
+session_resource {
+  name: "user_lexicon"
+  classname: "UserLexiconResource"
+}

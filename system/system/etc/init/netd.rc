@@ -1,0 +1,11 @@
+service netd /system/bin/netd
+    class main
+    socket netd stream 0660 root system
+    socket dnsproxyd stream 0660 root inet
+    socket mdns stream 0660 root system
+    socket fwmarkd stream 0660 root inet
+    # 2013-04-17 D6-4team-3p@lge.com LGP_DATA_LG_DATA_LISTENER [START]
+    socket lgdatalistenerd stream 0660 root inet
+    # 2013-04-17 D6-4team-3p@lge.com LGP_DATA_LG_DATA_LISTENER [END]
+    onrestart restart zygote
+    onrestart restart zygote_secondary
