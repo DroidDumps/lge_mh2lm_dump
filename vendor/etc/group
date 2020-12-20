@@ -1,0 +1,15 @@
+vendor_qti_diag::2901:
+vendor_qdss::2902:
+vendor_rfs::2903:
+vendor_rfs_shared::2904:
+vendor_adpl_odl::2905:
+vendor_qrtr::2906:
+vendor_lgapps::5000:
+vendor_lgdrm::5001:
+vendor_lgdrm_acc::5002:
+vendor_lgkeyguard::5004:
+vendor_eas::5005:
+vendor_imsvt::5014:
+vendor_lgmms::5201:
+vendor_smartshare::5903:
+vendor_cnas_rw::5907:

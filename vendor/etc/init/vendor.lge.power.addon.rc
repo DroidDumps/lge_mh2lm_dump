@@ -1,0 +1,6 @@
+# Copyright (c) 2019, LG Eletronics. All rights reserved.
+#
+
+on chargerlogo_exec
+   start vendor.lge-dualscreen-hal-1-0
+
