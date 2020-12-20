@@ -1,0 +1,11 @@
+service lgsecclk /product/bin/lgsecclkserver
+    class main
+        user system
+            group system vendor_lgdrm_acc sdcard_rw media_rw
+
+# restart when servicemanager is restarted
+on property:init.svc.servicemanager=restarting
+     restart lgsecclk
+
+on post-fs-data
+mkdir /mnt/vendor/persist-lg/secclk 0700 system system
